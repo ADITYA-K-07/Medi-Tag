@@ -7,6 +7,22 @@ on:
 jobs:
   api:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql+psycopg://meditag:ci-only@localhost:5432/meditag
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: meditag
+          POSTGRES_USER: meditag
+          POSTGRES_PASSWORD: ci-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U meditag -d meditag"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     defaults:
       run:
         working-directory: services/api
@@ -18,6 +34,10 @@ jobs:
       - run: python -m pip install -e ".[dev]"
       - run: python -m ruff check --no-cache .
       - run: python -m pytest
+      - run: python -m alembic upgrade head --sql > migration.sql
+      - run: python -m alembic upgrade head
+      - run: python -m alembic downgrade base
+      - run: python -m alembic upgrade head
 
   web:
     runs-on: ubuntu-latest

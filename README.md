@@ -82,6 +82,7 @@ flutter run
 cd services/api
 python -m pytest
 python -m ruff check --no-cache .
+python -m alembic upgrade head --sql
 
 cd ../../apps/web
 npm test
@@ -94,6 +95,10 @@ flutter test
 ```
 
 The API health endpoints are `GET /health` and `GET /ready`.
+
+For implementation context, see the short decisions in `docs/adr`, the
+[database map](docs/database.md), and the NFC contract in
+`packages/contracts/nfc-payload-v1.md`.
 
 ## Safety
 

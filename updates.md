@@ -1,6 +1,6 @@
 # MediTag Build Progress
 
-Last updated: 2026-09-26
+Last updated: 2026-09-26 after Session 2
 
 ## Project objective
 
@@ -27,9 +27,9 @@ Tier 2 medical information remains restricted to citizens and verified doctors.
 
 ## Current session and overall status
 
-- Most recently completed: Session 1 of 19 - repository foundation
-- Overall status: Session 1 complete; Session 2 not started
-- Next milestone: database models, migrations, encryption, and Ed25519 primitives
+- Most recently completed: Session 2 of 19 - data and cryptography foundation
+- Overall status: Session 2 complete; Session 3 not started
+- Next milestone: citizen authentication and account recovery
 
 ## Completed sessions
 
@@ -42,6 +42,17 @@ Tier 2 medical information remains restricted to citizens and verified doctors.
 - Recorded the core architecture decisions and shared-contract ownership.
 - Replaced generated demo screens with small MediTag foundation screens.
 - Expanded the root and application READMEs with direct setup commands.
+
+### Session 2 - Database and cryptography (2026-09-26)
+
+- Implementation commit: pending final Session 2 commit
+- Added the account-centered SQLAlchemy schema and initial Alembic migration.
+- Added versioned Fernet field encryption with authenticated decryption.
+- Added deterministic Ed25519 tag signing and public-key verification.
+- Published the NFC version 1 canonical byte format and fixed test vector.
+- Added environment-backed settings and a safe local key-generation script.
+- Configured CI to apply, downgrade, and reapply the migration on PostgreSQL 17.
+- Added a concise database map for future sessions and manual maintenance.
 
 ## Current repository structure
 
@@ -58,7 +69,13 @@ docs/adr           Architecture decisions
 
 - `GET /health`: process health response.
 - `GET /ready`: dependency-readiness placeholder.
-- No domain schemas or database migrations exist yet; they belong to Session 2.
+- No authentication or domain endpoints exist yet; Session 3 starts those APIs.
+- Migration `20260926_01` creates `accounts`, role profiles, doctor verification
+  events, consent history, encrypted emergency profiles and medical records,
+  NFC tags/write versions, refresh sessions, one-time tokens, and access logs.
+- Sensitive payloads store ciphertext beside an explicit encryption-key version.
+- NFC signatures use the canonical contract in
+  `packages/contracts/nfc-payload-v1.md`.
 
 ## Verification commands and latest results
 
@@ -76,10 +93,23 @@ Session 1 results:
 - `docker compose config`: not run because Docker is not installed
 - `git diff --check`: passed apart from Git's informational LF/CRLF warning
 
+Session 2 results:
+
+- Backend Ruff: passed
+- Backend pytest: passed, 15 tests
+- Alembic offline upgrade: passed and emitted all 13 tables
+- Alembic offline downgrade: passed in reverse dependency order
+- Migration output contains no duplicate SQL terminators
+- Local key generator: passed and emitted the five expected variable names
+- Flutter regression: analysis passed and 1 test passed
+- Web regression: test, lint, and Next.js production build passed
+- Live PostgreSQL migration: not run locally because Docker/PostgreSQL is absent;
+  PostgreSQL 17 upgrade/downgrade/re-upgrade validation is configured in CI
+
 ## Remaining session checklist
 
 - [x] Session 1 - Repository foundation and this progress file
-- [ ] Session 2 - Database models, migrations, encryption, and Ed25519
+- [x] Session 2 - Database models, migrations, encryption, and Ed25519
 - [ ] Session 3 - Citizen authentication and recovery
 - [ ] Session 4 - Citizen profiles, records, consent, export, and deletion
 - [ ] Session 5 - NFC tag lifecycle, signatures, and public scans
@@ -111,14 +141,20 @@ Session 1 results:
 - Root: `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT`,
   `REDIS_PORT`
 - API: `APP_ENV`, `API_HOST`, `API_PORT`, `DATABASE_URL`, `REDIS_URL`
+- API cryptography: `FIELD_ENCRYPTION_CURRENT_VERSION`,
+  `FIELD_ENCRYPTION_KEYS`, `TAG_SIGNING_KEY_ID`, `TAG_SIGNING_PRIVATE_KEY`,
+  `TAG_SIGNING_PUBLIC_KEYS`
 - Web: `NEXT_PUBLIC_API_URL`
 
 ## Next session starting instructions
 
-1. Read this file and `docs/adr` before changing code.
-2. Run the Session 1 checks to establish a clean baseline.
-3. Add SQLAlchemy, psycopg, Alembic, settings, and cryptography dependencies to
-   `services/api/pyproject.toml`.
-4. Design only the agreed Session 2 tables and generate the initial migration.
-5. Add field-encryption and Ed25519 utilities after the migration passes against
-   PostgreSQL; keep their interfaces small and cover them with fixed test vectors.
+1. Read this file, `docs/database.md`, and the Session 2 security modules.
+2. Run Ruff, pytest, and the offline Alembic upgrade as the baseline.
+3. Add password hashing, access JWT, refresh-token, and email-token services.
+4. Add the database session dependency without creating an engine at import time.
+5. Implement citizen register, email verification, login, refresh, logout,
+   forgot-password, and reset-password endpoints behind a small auth service.
+6. Use a console email adapter in development and keep provider delivery behind
+   one interface for the deployment session.
+7. Test duplicate email, unverified login, rotation/reuse, expiry, revocation,
+   invalid reset tokens, and account isolation before completing Session 3.

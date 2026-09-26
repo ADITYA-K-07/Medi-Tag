@@ -8,7 +8,12 @@ version = "0.1.0"
 description = "MediTag backend API"
 requires-python = ">=3.11"
 dependencies = [
+  "alembic>=1.14,<2.0",
+  "cryptography>=44,<47",
   "fastapi>=0.115,<1.0",
+  "psycopg[binary]>=3.2,<4.0",
+  "pydantic-settings>=2.7,<3.0",
+  "sqlalchemy>=2.0,<3.0",
   "uvicorn[standard]>=0.34,<1.0",
 ]
 
@@ -31,3 +36,6 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
