@@ -45,7 +45,7 @@ Tier 2 medical information remains restricted to citizens and verified doctors.
 
 ### Session 2 - Database and cryptography (2026-09-26)
 
-- Implementation commit: pending final Session 2 commit
+- Implementation commit: `52b8030` (`feat: add data and cryptography foundation`)
 - Added the account-centered SQLAlchemy schema and initial Alembic migration.
 - Added versioned Fernet field encryption with authenticated decryption.
 - Added deterministic Ed25519 tag signing and public-key verification.
