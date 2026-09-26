@@ -35,7 +35,7 @@ Tier 2 medical information remains restricted to citizens and verified doctors.
 
 ### Session 1 - Repository foundation (2026-09-26)
 
-- Commit: pending final Session 1 commit
+- Implementation commit: `63d8c9e` (`chore: bootstrap MediTag monorepo`)
 - Created the Flutter Android, Next.js, and FastAPI application foundations.
 - Added local PostgreSQL/Redis Compose configuration and environment examples.
 - Added baseline tests, linting, production build checks, and GitHub Actions CI.
